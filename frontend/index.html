@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeepRound | Professional Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">DeepRound</div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <div class="nav-group">
+          <div class="nav-group-label">Platform</div>
+          <button class="nav-item active" data-page="home">
+            <i class="ph ph-squares-four"></i> Overview
+          </button>
+          <button class="nav-item" data-page="voice">
+            <i class="ph ph-microphone-stage"></i> Voice Sessions
+          </button>
+          <button class="nav-item" data-page="improve">
+            <i class="ph ph-sparkle"></i> Make Me Better
+          </button>
+          <button class="nav-item" data-page="accurate-context">
+            <i class="ph ph-target"></i> AccurateContext
+          </button>
+          <button class="nav-item" data-page="dumpflex">
+            <i class="ph ph-folder-notch-open"></i> DumpFlex Assets
+          </button>
+          <button class="nav-item" data-page="drives">
+            <i class="ph ph-buildings"></i> Company Drives
+          </button>
+        </div>
+
+        <div class="nav-group mt-auto">
+          <div class="nav-group-label">Account</div>
+          <button class="nav-item" data-page="profile">
+            <i class="ph ph-user-circle"></i> Builder Profile
+          </button>
+          <button class="nav-item" data-page="settings">
+            <i class="ph ph-gear"></i> Preferences
+          </button>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="status-indicator">
+          <div class="status-dot" id="statusDot"></div>
+          <span id="statusText">System Offline</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <header class="mobile-header">
+        <div class="logo">DeepRound</div>
+        <button class="menu-toggle" id="menuToggle"><i class="ph ph-list"></i></button>
+      </header>
+
+      <!-- PAGE: OVERVIEW -->
+      <section id="page-home" class="page active">
+        <header class="page-header">
+          <h1 class="page-title">Overview</h1>
+          <p class="page-subtitle">Your articulation readiness and recent activity.</p>
+        </header>
+
+        <div class="dashboard-grid mb-6">
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-label">Readiness Score</span>
+              <i class="ph ph-trend-up text-muted"></i>
+            </div>
+            <div class="metric-value" id="statReadiness">68%</div>
+            <div class="metric-trend positive" id="statReadinessTrend">+4% this week</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-label">Completed Sessions</span>
+              <i class="ph ph-microphone text-muted"></i>
+            </div>
+            <div class="metric-value" id="statSessions">0</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="metric-label">Avg. Rating</span>
+              <i class="ph ph-star text-muted"></i>
+            </div>
+            <div class="metric-value flex items-center gap-2">
+              <span id="statRating">0.0</span> <i class="ph ph-star text-warning text-lg"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h2 class="panel-title">Recent Sessions & Transcripts</h2>
+          </div>
+          <div class="panel-body p-0">
+            <div class="table-container">
+              <table class="w-full">
+                <thead>
+                  <tr>
+                    <th>Company / Round</th>
+                    <th>Date</th>
+                    <th>Self Rating</th>
+                    <th>Transcript</th>
+                  </tr>
+                </thead>
+                <tbody id="recentSessionsTableBody">
+                  <tr><td colspan="4" class="text-center p-4 text-muted">No sessions completed yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE: VOICE SESSIONS -->
+      <section id="page-voice" class="page">
+        <!-- STEP 1: Select Company View -->
+        <div id="voiceCompanySelection">
+          <header class="page-header">
+            <h1 class="page-title">Voice Sessions</h1>
+            <p class="page-subtitle">Select a target company to begin the recruiting pipeline simulation.</p>
+          </header>
+          <div class="panel max-w-2xl">
+            <div class="panel-body">
+              <div class="form-group">
+                <label class="form-label">Target Company</label>
+                <select id="pipelineCompanySelect" class="form-input">
+                  <option value="">-- Choose a Company --</option>
+                  <!-- Populated dynamically -->
+                </select>
+              </div>
+              <button class="btn btn-primary mt-4" id="loadPipelineBtn" disabled>Load Recruiting Pipeline</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: Full Recruiting Pipeline UI -->
+        <div id="voicePipelineSelection" class="hidden">
+          <header class="page-header flex justify-between items-center">
+            <div>
+              <h1 class="page-title">Recruiting Pipeline: <span id="pipelineCompanyName" class="text-brand">Company</span></h1>
+              <p class="page-subtitle">Select the specific interview round you want to practice.</p>
+            </div>
+            <button class="btn btn-ghost" id="pipelineBackBtn"><i class="ph ph-arrow-left"></i> Change Company</button>
+          </header>
+          <div class="pipeline-stepper">
+            <div class="pipeline-step" data-round="Resume Screening"><div class="step-number">1</div><div class="step-info"><h3>Resume Screening</h3><p>Defend your past projects and academic background.</p></div></div>
+            <div class="pipeline-step" data-round="Online Assessment"><div class="step-number">2</div><div class="step-info"><h3>Online Assessment (OA)</h3><p>Verbal logic prep for DSA, DBMS, and OS fundamentals.</p></div></div>
+            <div class="pipeline-step" data-round="Group Discussion"><div class="step-number">3</div><div class="step-info"><h3>Group Discussion</h3><p>Simulate a multi-participant scenario to test communication.</p></div></div>
+            <div class="pipeline-step" data-round="Tech 1: Problem Solving"><div class="step-number">4</div><div class="step-info"><h3>Tech 1: Problem Solving</h3><p>Explain algorithm logic and optimize solutions verbally.</p></div></div>
+            <div class="pipeline-step" data-round="Tech 2: Fundamentals"><div class="step-number">5</div><div class="step-info"><h3>Tech 2: CS Fundamentals</h3><p>Deep dive into OOPs, networking, and system architecture.</p></div></div>
+            <div class="pipeline-step featured" data-round="Managerial Round"><div class="step-number">6</div><div class="step-info"><h3>Managerial Round</h3><p>Test handling of stress, technical trade-offs, and teamwork.</p></div></div>
+            <div class="pipeline-step" data-round="HR & Behavioral"><div class="step-number">7</div><div class="step-info"><h3>HR & Behavioral</h3><p>STAR-method questions to assess cultural fit.</p></div></div>
+            <div class="pipeline-step featured-danger" data-round="Panic Mode"><div class="step-number"><i class="ph ph-siren"></i></div><div class="step-info"><h3 class="text-danger">Panic Mode</h3><p>Last-minute cramming. Non-conversational, 5-second rapid-fire snippets.</p></div></div>
+          </div>
+        </div>
+
+        <!-- STEP 3: Session Prep View -->
+        <div id="voiceSessionPrep" class="hidden">
+          <header class="page-header flex justify-between items-center">
+            <div>
+              <h1 class="page-title">Session Prep: <span id="prepModeName" class="text-brand">Mode</span></h1>
+              <p class="page-subtitle">Initialize your audio engine to begin the interview round.</p>
+            </div>
+            <button class="btn btn-ghost" id="prepBackBtn"><i class="ph ph-arrow-left"></i> Change Round</button>
+          </header>
+          <div class="panel max-w-3xl mb-6">
+            <button id="toggleCustomizationBtn" class="w-full text-left p-4 border-b border-subtle flex justify-between items-center bg-surface hover:bg-surface-hover transition-colors font-medium">
+              <span><i class="ph ph-faders mr-2"></i> Advanced Customization (Voice & Prompts)</span>
+              <i class="ph ph-caret-down transition-transform" id="customizationCaret"></i>
+            </button>
+            <div id="prepCustomizationPanel" class="panel-body form-grid hidden bg-base border-b border-subtle">
+              <div class="form-group col-span-2">
+                <label class="form-label">Interviewer Voice Persona</label>
+                <select id="prepVoiceSelect" class="form-input">
+                  <option value="Zephyr">Zephyr (Professional & Warm)</option>
+                  <option value="Puck">Puck (Energetic)</option>
+                  <option value="Charon">Charon (Stern Manager)</option>
+                  <option value="Kore">Kore (Calm)</option>
+                </select>
+              </div>
+              <div class="form-group col-span-2">
+                <div class="flex justify-between items-center mb-2">
+                  <label class="form-label mb-0">System Prompt (Auto-filled & Editable)</label>
+                  <button class="btn btn-ghost btn-sm" id="prepGeneratePromptBtn"><i class="ph ph-arrows-clockwise"></i> Reset to Default</button>
+                </div>
+                <div class="quick-chips mb-2" id="quickChipsContainer">
+                  <button class="chip" data-inject="Focus heavily on SQL optimization and database design."><span>+</span> SQL</button>
+                  <button class="chip" data-inject="Test my knowledge on microservices and distributed systems."><span>+</span> System Design</button>
+                  <button class="chip" data-inject="Ask strictly behavioral questions expecting the STAR method format."><span>+</span> STAR Method</button>
+                  <button class="chip" data-inject="Grill me on the tech stack mentioned in the Job Description."><span>+</span> JD Tech Stack</button>
+                  <button class="chip" data-inject="Act extremely aggressive and interrupt me frequently to test my composure."><span>+</span> Aggressive</button>
+                </div>
+                <textarea id="prepCustomPrompt" class="form-textarea" rows="6" placeholder="Define how the interviewer should act..."></textarea>
+              </div>
+            </div>
+            <div class="panel-body flex justify-center bg-surface">
+              <button class="btn btn-primary btn-lg max-w-md w-full" id="prepStartEngineBtn"><i class="ph ph-power text-xl"></i> START INTERVIEW ENGINE</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 4: Active Session View -->
+        <div id="voiceSession" class="hidden">
+          <div class="session-header flex justify-between items-center mb-6">
+            <div class="flex gap-4 items-center">
+              <button class="btn btn-ghost text-danger" id="voiceEndBtn"><i class="ph ph-stop-circle"></i> End Session</button>
+              <div class="session-badge" id="activeSessionModeName">Deep Round</div>
+            </div>
+          </div>
+          <div class="session-container">
+            <div class="session-orb-container">
+              <div class="audio-orb" id="voiceOrb"></div>
+              <div class="session-status" id="voiceStatus">Ready to connect</div>
+              <div class="session-controls w-full mt-4">
+                <button class="btn btn-primary w-full" id="connectBtn">Connect Audio</button>
+                <button class="btn btn-outline w-full hidden" id="micBtn">Enable Microphone</button>
+                <button class="btn btn-danger w-full hidden" id="disconnectBtn">Disconnect Audio</button>
+              </div>
+            </div>
+            <div class="transcript-panel">
+              <div class="transcript-header flex justify-between items-center">
+                <span>Session Chat & Transcript</span>
+                <span class="text-xs text-muted">You can talk via mic, or type here.</span>
+              </div>
+              <div class="chat-log" id="chat-log"></div>
+              <div class="chat-input-area">
+                <input type="text" id="textInput" class="form-input" placeholder="Type a response if you prefer text chat...">
+                <button id="sendBtn" class="btn btn-secondary"><i class="ph ph-paper-plane-right"></i> Send</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 5: Post-Session Rating View -->
+        <div id="postSessionView" class="hidden">
+          <header class="page-header text-center">
+            <h1 class="page-title text-success"><i class="ph ph-check-circle"></i> Session Completed</h1>
+            <p class="page-subtitle">Rate your performance and log feedback for <span id="postSessionModeName" class="font-bold"></span>.</p>
+          </header>
+          <div class="panel max-w-2xl mx-auto">
+            <div class="panel-body flex flex-col items-center gap-6">
+              <div class="rating-container text-center">
+                <label class="form-label mb-2 block">How well did you articulate your thoughts?</label>
+                <div class="star-rating" id="starRatingSelector">
+                  <i class="ph-fill ph-star" data-value="1"></i>
+                  <i class="ph-fill ph-star" data-value="2"></i>
+                  <i class="ph-fill ph-star" data-value="3"></i>
+                  <i class="ph-fill ph-star" data-value="4"></i>
+                  <i class="ph-fill ph-star" data-value="5"></i>
+                </div>
+                <input type="hidden" id="postSessionRatingValue" value="0">
+              </div>
+              <div class="form-group w-full">
+                <label class="form-label">Personal Notes / Areas for Improvement</label>
+                <textarea id="postSessionNotes" class="form-textarea" rows="4" placeholder="e.g. Stumbled on time complexity..."></textarea>
+              </div>
+              <button class="btn btn-primary w-full btn-lg mt-2" id="saveSessionFeedbackBtn">Save & Return to Pipeline</button>
+            </div>
+          </div>
+        </div>
+        <video id="video-preview" autoplay playsinline hidden></video>
+      </section>
+
+      <!-- PAGE: MAKE ME BETTER (COACHING) -->
+      <section id="page-improve" class="page">
+        <header class="page-header">
+          <h1 class="page-title">Make Me Better</h1>
+          <p class="page-subtitle">Type <strong>@</strong> in the chat to attach past transcripts for optimized AI coaching.</p>
+        </header>
+
+        <div class="panel max-w-3xl mx-auto h-[600px] flex flex-col">
+          <div class="panel-header flex justify-between items-center bg-bg-surface">
+            <span><i class="ph ph-sparkle text-brand"></i> Coaching Engine</span>
+            <span class="badge badge-neutral" id="coachingStatus">Offline</span>
+          </div>
+          
+          <div class="chat-log flex-1" id="improveChatLog">
+            <div class="message gemini">Hello! I am your technical interview coach. Type <strong>@</strong> in the input below to link a past session transcript, and ask me to analyze your performance!</div>
+          </div>
+
+          <div class="chat-input-area border-t border-border-subtle p-4 relative flex flex-col gap-2">
+            <!-- Mention Dropdown -->
+            <ul id="mentionDropdown" class="mention-dropdown hidden">
+              <!-- Populated dynamically via JS -->
+            </ul>
+
+            <!-- Selected Context Chips -->
+            <div id="improveChipsContainer" class="flex gap-2 flex-wrap"></div>
+            
+            <div class="flex gap-2 w-full relative">
+              <input type="text" id="improveTextInput" class="form-input flex-1" placeholder="Type @ to attach a session, or ask a question...">
+              <button id="improveSendBtn" class="btn btn-primary"><i class="ph ph-paper-plane-right"></i> Send</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE: ACCURATE CONTEXT -->
+      <section id="page-accurate-context" class="page">
+        <header class="page-header">
+          <h1 class="page-title">AccurateContext Engine</h1>
+          <p class="page-subtitle">Answer the AI's questions to build a hyper-accurate context profile.</p>
+        </header>
+
+        <div class="panel max-w-3xl mx-auto flex flex-col h-[600px]">
+          <div class="panel-header flex justify-between items-center bg-bg-surface">
+            <span><i class="ph ph-brain text-brand"></i> Dynamic Context Profiler</span>
+            <span class="badge badge-neutral" id="acStatus">Ready</span>
+          </div>
+
+          <div class="ac-chat-log flex-1" id="acChatLog">
+            <div class="ac-message gemini">
+              <p>Welcome! I'll ask you a series of questions to build your professional context profile.</p>
+              <button class="btn btn-primary mt-4" id="startAcBtn">Begin Profiling</button>
+            </div>
+          </div>
+
+          <div class="ac-input-area border-t border-border-subtle p-4 relative flex flex-col gap-4 hidden" id="acInputArea">
+            <div id="acOptionsContainer" class="flex flex-col gap-2"></div>
+            <div id="acTextContainer" class="flex gap-2 w-full">
+              <textarea id="acTextInput" class="form-textarea flex-1" rows="2" placeholder="Type your answer..."></textarea>
+              <div class="flex flex-col gap-2">
+                <button id="acSendBtn" class="btn btn-primary h-full"><i class="ph ph-paper-plane-right"></i></button>
+                <button id="acMicBtn" class="btn btn-outline h-full text-brand" title="Answer via Voice"><i class="ph ph-microphone"></i></button>
+              </div>
+            </div>
+            <div class="flex justify-between items-center text-sm">
+              <button class="btn btn-ghost text-muted" id="acSkipBtn">I don't want to answer this</button>
+              <button class="btn btn-ghost text-muted" id="acExplainBtn">I don't fully understand</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE: DUMPFLEX & RESUMES -->
+      <section id="page-dumpflex" class="page">
+        <header class="page-header">
+          <h1 class="page-title">DumpFlex Assets</h1>
+          <p class="page-subtitle">Manage resumes, raw data, and codebase structures.</p>
+        </header>
+        <div class="two-col-layout">
+          <div class="layout-main">
+            <div class="panel mb-6">
+              <div class="panel-header flex justify-between items-center">
+                <h2 class="panel-title">Asset Manager</h2>
+                <div class="flex gap-2">
+                  <button class="btn btn-secondary btn-sm" onclick="document.getElementById('resumeUpload').click()"><i class="ph ph-upload"></i> Add File</button>
+                  <button class="btn btn-outline btn-sm" id="openCodebaseModalBtn"><i class="ph ph-github-logo"></i> Add Codebase</button>
+                </div>
+                <input type="file" id="resumeUpload" accept="image/*,.pdf,.docx,.txt" class="hidden">
+              </div>
+              <div class="panel-body p-0">
+                <div class="table-container">
+                  <table class="w-full">
+                    <thead>
+                      <tr><th>Asset Name</th><th>Type</th><th>Extracted Profile/Details</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody id="resumeTableBody">
+                      <tr><td colspan="4" class="text-center p-4 text-muted">No assets uploaded yet.</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-header"><h2 class="panel-title">Quick Note (DumpFlex)</h2></div>
+              <div class="panel-body">
+                <textarea id="dumpflexInput" class="form-textarea" rows="4" placeholder="Paste achievements, project updates..."></textarea>
+                <div class="flex justify-end mt-4"><button class="btn btn-primary" id="dumpflexSubmitBtn">Save Note</button></div>
+              </div>
+            </div>
+          </div>
+          <div class="layout-sidebar">
+            <div class="panel h-full">
+              <div class="panel-header"><h2 class="panel-title">Repository</h2></div>
+              <div class="panel-body p-0"><div class="repository-list" id="dumpflexItems"><div class="empty-state">No materials added yet.</div></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE: DRIVES -->
+      <section id="page-drives" class="page">
+        <header class="page-header flex justify-between items-center">
+          <div>
+            <h1 class="page-title">Company Drives</h1>
+            <p class="page-subtitle">Track upcoming recruiting events, manage JDs, and set priority.</p>
+          </div>
+          <button class="btn btn-primary" id="openAddCompanyModalBtn"><i class="ph ph-plus"></i> Add Company</button>
+        </header>
+        <div class="drive-list-container" id="companiesList">
+          <div class="panel p-8 text-center text-muted">No companies added.</div>
+        </div>
+      </section>
+
+      <!-- PAGE: PROFILE & PORTFOLIO -->
+      <section id="page-profile" class="page">
+        <header class="page-header">
+          <h1 class="page-title">Builder Profile & Portfolio</h1>
+          <p class="page-subtitle">Define your professional identity and manage your deep-dive projects.</p>
+        </header>
+        <div class="two-col-layout">
+          <div class="layout-main">
+            <div class="panel mb-6">
+              <div class="panel-header flex justify-between items-center">
+                <h2 class="panel-title">Project Portfolio</h2>
+                <button class="btn btn-primary btn-sm" id="openAddProjectModalBtn"><i class="ph ph-plus"></i> Add Project</button>
+              </div>
+              <div class="panel-body bg-base">
+                <div class="project-list-container flex flex-col gap-4" id="projectsList">
+                  <div class="text-center p-4 text-muted border border-border-strong rounded border-dashed">No projects added.</div>
+                </div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-header"><h2 class="panel-title">Basic Information</h2></div>
+              <div class="panel-body form-grid">
+                <div class="form-group"><label class="form-label">Full Name</label><input type="text" id="profileName" class="form-input"></div>
+                <div class="form-group"><label class="form-label">Target Role</label><input type="text" id="profileRole" class="form-input"></div>
+                <div class="form-group col-span-2"><label class="form-label">Professional Summary</label><textarea id="profileSummary" class="form-textarea" rows="3"></textarea></div>
+                <div class="form-group col-span-2 flex justify-end mt-2"><button class="btn btn-secondary" id="saveProfileBtn">Save Profile</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE: SETTINGS -->
+      <section id="page-settings" class="page">
+        <header class="page-header"><h1 class="page-title">Preferences</h1></header>
+        <div class="panel max-w-2xl">
+          <div class="panel-body form-grid">
+            <div class="form-group col-span-2">
+              <label class="form-label">Global System Instructions</label>
+              <textarea id="systemInstruction" class="form-textarea" rows="4" placeholder="Global overrides for all sessions..."></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODALS CONTAINER -->
+  <div class="modal-overlay hidden" id="modalOverlay">
+    
+    <!-- View Transcript Modal -->
+    <div class="modal hidden" id="transcriptModal" style="max-width: 800px; max-height: 90vh; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <h3>Session Transcript</h3>
+        <button class="btn-icon" id="closeTranscriptModal"><i class="ph ph-x"></i></button>
+      </div>
+      <div class="modal-body p-0 flex-1 overflow-hidden" style="display: flex; flex-direction: column;">
+        <div class="chat-log" id="transcriptModalLog" style="height: 500px;"></div>
+      </div>
+    </div>
+
+    <!-- Resume/File Name Modal -->
+    <div class="modal hidden" id="resumeNameModal">
+      <div class="modal-header"><h3>Name Your Upload</h3><button class="btn-icon" id="closeResumeModal"><i class="ph ph-x"></i></button></div>
+      <div class="modal-body">
+        <div class="form-group"><label class="form-label">Custom Label</label><input type="text" id="newResumeNameInput" class="form-input"></div>
+        <div id="resumeExtractingUI" class="hidden mt-4 text-brand flex items-center gap-2"><i class="ph ph-spinner animate-spin"></i> Processing...</div>
+      </div>
+      <div class="modal-footer flex justify-end"><button class="btn btn-primary" id="saveResumeBtn">Save Upload</button></div>
+    </div>
+
+    <!-- Add Codebase Modal -->
+    <div class="modal hidden" id="codebaseModal">
+      <div class="modal-header"><h3>Link Codebase / Repository</h3><button class="btn-icon" id="closeCodebaseModal"><i class="ph ph-x"></i></button></div>
+      <div class="modal-body">
+        <div class="form-group"><label class="form-label">Paste GitHub URL</label><input type="text" id="codebaseRawInput" class="form-input" placeholder="https://github.com/owner/repo"></input></div>
+        <div id="codebaseExtractingUI" class="hidden mt-4 text-brand flex items-center gap-2"><i class="ph ph-spinner animate-spin"></i> Parsing repo via Advanced AI...</div>
+      </div>
+      <div class="modal-footer flex justify-end"><button class="btn btn-primary" id="saveCodebaseBtn">Extract Codebase</button></div>
+    </div>
+
+    <!-- Add Company Modal -->
+    <div class="modal hidden" id="companyModal">
+      <div class="modal-header"><h3 id="companyModalTitle">Add Company</h3><button class="btn-icon" id="closeCompanyModal"><i class="ph ph-x"></i></button></div>
+      <div class="modal-body form-grid">
+        <div class="form-group col-span-2"><label class="form-label">Company Name</label><input type="text" id="companyNameInput" class="form-input"></div>
+        <div class="form-group"><label class="form-label">Priority</label><select id="companyPriorityInput" class="form-input"><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select></div>
+        <div class="form-group col-span-2">
+          <label class="form-label">Job Details</label>
+          <textarea id="companyUrlInput" class="form-textarea w-full" rows="3"></textarea>
+          <button class="btn btn-secondary mt-2 w-full" id="autoExtractBtn"><i class="ph ph-magic-wand"></i> Auto-Extract Details</button>
+          <div id="companyExtractingUI" class="hidden mt-4 text-brand flex items-center justify-center gap-2 p-2 border border-border-strong rounded bg-bg-base"><i class="ph ph-spinner animate-spin"></i> Scraping...</div>
+        </div>
+      </div>
+      <div class="modal-footer flex justify-end"><button class="btn btn-primary" id="saveCompanyBtn">Save Company</button></div>
+    </div>
+
+    <!-- Add Project Modal -->
+    <div class="modal hidden" id="projectModal">
+      <div class="modal-header"><h3>Add Portfolio Project</h3><button class="btn-icon" id="closeProjectModal"><i class="ph ph-x"></i></button></div>
+      <div class="modal-body form-grid">
+        <div class="form-group col-span-2"><label class="form-label">Project Title</label><input type="text" id="projectTitleInput" class="form-input"></div>
+        <div class="form-group col-span-2"><label class="form-label">Tech Stack</label><input type="text" id="projectStackInput" class="form-input"></div>
+        <div class="form-group col-span-2"><label class="form-label">Short Description</label><textarea id="projectDescInput" class="form-textarea" rows="2"></textarea></div>
+      </div>
+      <div class="modal-footer flex justify-end"><button class="btn btn-primary" id="saveProjectBtn">Save Project</button></div>
+    </div>
+    
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script src="/static/pcm-processor.js"></script>
+  <script src="/static/media-handler.js"></script>
+  <script src="/static/gemini-client.js"></script>
+  <script src="/static/main.js"></script>
+</body>
+</html>
