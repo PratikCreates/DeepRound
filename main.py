@@ -9,8 +9,8 @@ from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
-from gemini_live import GeminiLive
-from twilio_handler import TwilioHandler
+from backend.gemini_live import GeminiLive
+from backend.twilio_handler import TwilioHandler
 
 # Load environment variables
 load_dotenv()
